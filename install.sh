@@ -32,7 +32,7 @@ echo Wordpress user = $WPUSER >> /root/WORDPRESSpassword.txt
 WPPASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
 echo Wordpress password = $WPPASSWORD >> /root/WORDPRESSpassword.txt
 echo "CREATE DATABASE $WPDATABASE;" >> /tmp/$WORDPRESSSITE.sql
-echo "GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD';" >> /tmp/$WORDPRESSSITE.sql
+echo "GRANT ALL ON $WPDATABASE.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD';" >> /tmp/$WORDPRESSSITE.sql
 echo "FLUSH PRIVILEGES;" >> /tmp/$WORDPRESSSITE.sql
 
 ## Installing Mariadb and Database setup for Wordpress
