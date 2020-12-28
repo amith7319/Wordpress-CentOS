@@ -6,7 +6,7 @@ fi
 read -p "Enter the system Wordpress site name:  " WORDPRESSSITE
 
 yum update -y
-yum install wget epel-release curl nano -y
+yum install wget epel-release curl nano certbot-nginx -y
 
 # Installing Nginx
 
@@ -130,6 +130,7 @@ server {
 EOL
 sed -i 's|fastcgi_param SCRIPT_FILENAME ;|fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;|g' /etc/nginx/conf.d/$WORDPRESSSITE.conf
 
+certbot --nginx -d $WORDPRESSSITE
 systemctl restart nginx
 
 echo ...............................Finished...Installation....!!!
