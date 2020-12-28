@@ -3,7 +3,7 @@ if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root"
    exit 1
 fi
-read -p "Enter the system hostname:  " WORDPRESSSITE
+read -p "Enter the system Wordpress site name:  " WORDPRESSSITE
 
 yum update -y
 yum install wget epel-release curl nano -y
@@ -24,13 +24,13 @@ fi
 
 # Database environment creation
 MYSQLROOT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
-echo Mysql root password = $MYSQLROOT >> /root/LEMPpassword.txt
+echo Mysql root password = $MYSQLROOT >> /root/WORDPRESSpassword.txt
 WPDATABASE=$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 10 | head -n 1)
-echo Wordpress database name = $WPDATABASE >> /root/LEMPpassword.txt
+echo Wordpress database name = $WPDATABASE >> /root/WORDPRESSpassword.txt
 WPUSER=$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 10 | head -n 1)
-echo Wordpress password = $WPUSER >> /root/LEMPpassword.txt
+echo Wordpress password = $WPUSER >> /root/WORDPRESSpassword.txt
 WPPASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
-echo Wordpress password = $WPPASSWORD >> /root/LEMPpassword.txt
+echo Wordpress password = $WPPASSWORD >> /root/WORDPRESSpassword.txt
 
 ## Installing Mariadb and Database setup for Wordpress
 if [ ! -x /usr/bin/mysql ];
@@ -49,28 +49,23 @@ if [ ! -x /usr/bin/mysql ];
       y
       y
       EOF
-      
+      mysql -u root -p $MYSQLROOT <<EOF
+      CREATE DATABASE  $WPDATABASE;
+      GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD';
+      FLUSH PRIVILEGES;
+      EXIT;
+      EOF
    else
       echo -----------------------------------------------------------------------------
       echo "MARIADB is already INSTALLED"
       echo -----------------------------------------------------------------------------
       read -p "Enter the Mysql root password:  " EXISTINGPASSWORD
       mysql -u root -p $EXISTINGPASSWORD
-fi
-
-
-# Installing Nginx
-
-if [ ! -x /usr/sbin/nginx ];
-    then
-        echo "NGINX will be INSTALLED now"
-        yum install nginx -y
-        systemctl start nginx
-        systemctl enable nginx
-    else
-        echo -----------------------------------------------------------------------------
-        echo "NGINX is already INSTALLED"
-        echo -----------------------------------------------------------------------------
+      CREATE DATABASE  $WPDATABASE;
+      GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD';
+      FLUSH PRIVILEGES;
+      EXIT;
+      EOF      
 fi
 
 
@@ -92,14 +87,6 @@ if [ ! -x /usr/bin/php ];
       echo -----------------------------------------------------------------------------
 fi
 
-# Downloading Wordpress
-sudo mkdir -p /var/www/html/$WORDPRESSSITE
-cd /tmp
-wget https://wordpress.org/latest.tar.gz
-tar xf latest.tar.gz
-mv /tmp/wordpress/* /var/www/html/$WORDPRESSSITE
-chown -R nginx: /var/www/html/$WORDPRESSSITE
-
 #Changing PHP-FPM according to Nginx
 
 sed -i 's|user = apache|user = nginx|g' /etc/php-fpm.d/www.conf
@@ -111,6 +98,14 @@ sed -i 's|;listen.mode = 0660|listen.mode = 0666|g' /etc/php-fpm.d/www.conf
 chown -R root:nginx /var/lib/php
 systemctl enable php-fpm
 systemctl start php-fpm
+
+# Downloading Wordpress
+sudo mkdir -p /var/www/html/$WORDPRESSSITE
+cd /tmp
+wget https://wordpress.org/latest.tar.gz
+tar xf latest.tar.gz
+mv /tmp/wordpress/* /var/www/html/$WORDPRESSSITE
+chown -R nginx: /var/www/html/$WORDPRESSSITE
 
 #Configuring TEST block NGINX
 
@@ -131,15 +126,11 @@ server {
   }
 }
 EOL
-sed -i 's|fastcgi_param SCRIPT_FILENAME ;|fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;|g' /etc/nginx/conf.d/default.conf
-touch /usr/share/nginx/html/info.php
-cat > /usr/share/nginx/html/info.php << EOL
-<?php
-phpinfo();
-?>
-EOL
+sed -i 's|fastcgi_param SCRIPT_FILENAME ;|fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;|g' /etc/nginx/conf.d/$WORDPRESSSITE.conf
+sed -i 's|root   /usr/share/nginx/html;|root   /usr/share/nginx/html/$WORDPRESSSITE;|g' /etc/nginx/conf.d/$WORDPRESSSITE.conf
 
 systemctl restart nginx
 
 echo ...............................Finished...Installation....!!!
-echo " Visit.... http://$IP/info.php"
+echo " Visit.... http://$WORDPRESSSITE"
+echo " All password and username are stored in /root/WORDPRESSpassword.txt
