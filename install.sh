@@ -48,7 +48,7 @@ if [ ! -x /usr/bin/mysql ];
       n
       y
       y
-      EOF
+EOF
       mysql -u root -p $MYSQLROOT "CREATE DATABASE  $WPDATABASE;"
       mysql -u root -p $MYSQLROOT "GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD';"
       mysql -u root -p $MYSQLROOT "FLUSH PRIVILEGES;"
