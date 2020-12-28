@@ -24,11 +24,11 @@ fi
 
 # Database environment creation
 MYSQLROOT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
-echo Mysql root password = $MYSQLROOT > /root/WORDPRESSpassword.txt
+echo Wordpress site name = $WORDPRESSSITE >> /root/WORDPRESSpassword.txt
 WPDATABASE=$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 10 | head -n 1)
 echo Wordpress database name = $WPDATABASE >> /root/WORDPRESSpassword.txt
 WPUSER=$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 10 | head -n 1)
-echo Wordpress password = $WPUSER >> /root/WORDPRESSpassword.txt
+echo Wordpress user = $WPUSER >> /root/WORDPRESSpassword.txt
 WPPASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
 echo Wordpress password = $WPPASSWORD >> /root/WORDPRESSpassword.txt
 
@@ -49,6 +49,7 @@ if [ ! -x /usr/bin/mysql ];
       y
       y
 EOF
+      echo Mysql root password = $MYSQLROOT > /root/WORDPRESSpassword.txt
       mysql -u root -p $MYSQLROOT "CREATE DATABASE  $WPDATABASE;"
       mysql -u root -p $MYSQLROOT "GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD';"
       mysql -u root -p $MYSQLROOT "FLUSH PRIVILEGES;"
