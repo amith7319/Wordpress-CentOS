@@ -50,25 +50,17 @@ if [ ! -x /usr/bin/mysql ];
       y
 EOF
       echo Mysql root password = $MYSQLROOT >> /root/WORDPRESSpassword.txt
-      mysql -u root -p <<EOF
-      $MYSQLROOT
-      CREATE DATABASE  $WPDATABASE;
-      GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD';
-      FLUSH PRIVILEGES;
-      EXIT;
-EOF
+      mysql -u root -p -e $EXISTINGPASSWORD "CREATE DATABASE $WPDATABASE"
+      mysql -u root -p -e $EXISTINGPASSWORD "GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD'"
+      mysql -u root -p -e $EXISTINGPASSWORD "FLUSH PRIVILEGES"
 else
       echo -----------------------------------------------------------------------------
       echo "MARIADB is already INSTALLED"
       echo -----------------------------------------------------------------------------
       read -p "Enter the Mysql root password:  " EXISTINGPASSWORD
-      mysql -u root -p <<EOF
-      $EXISTINGPASSWORD 
-      CREATE DATABASE  $WPDATABASE;
-      GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD';
-      FLUSH PRIVILEGES;
-      EXIT;
-EOF
+      mysql -u root -p -e $EXISTINGPASSWORD "CREATE DATABASE $WPDATABASE"
+      mysql -u root -p -e $EXISTINGPASSWORD "GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD'"
+      mysql -u root -p -e $EXISTINGPASSWORD "FLUSH PRIVILEGES"
 fi
 
 
@@ -111,9 +103,9 @@ mv /tmp/wordpress/* /var/www/html/$WORDPRESSSITE
 cd /var/www/html/$WORDPRESSSITE
 cp wp-config-sample.php wp-config.php	
 chown -R nginx: /var/www/html/$WORDPRESSSITE
-sed -i 's|database_name_here|$WPDATABASE|g' /var/www/html/$WORDPRESSSITE/wp-config.php
-sed -i 's|username_here|$WPUSER|g' /var/www/html/$WORDPRESSSITE/wp-config.php
-sed -i 's|password_here|$WPPASSWORD|g' /var/www/html/$WORDPRESSSITE/wp-config.php
+sed -i 's|database_name_here|'$WPDATABASE'|g' /var/www/html/$WORDPRESSSITE/wp-config.php
+sed -i 's|username_here|'$WPUSER'|g' /var/www/html/$WORDPRESSSITE/wp-config.php
+sed -i 's|password_here|'$WPPASSWORD'|g' /var/www/html/$WORDPRESSSITE/wp-config.php
 
 #Configuring TEST block NGINX
 
