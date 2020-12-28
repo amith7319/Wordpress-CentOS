@@ -50,17 +50,23 @@ if [ ! -x /usr/bin/mysql ];
       y
 EOF
       echo Mysql root password = $MYSQLROOT >> /root/WORDPRESSpassword.txt
-      mysql -u root -p $MYSQLROOT "CREATE DATABASE  $WPDATABASE;"
-      mysql -u root -p $MYSQLROOT "GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD';"
-      mysql -u root -p $MYSQLROOT "FLUSH PRIVILEGES;"
-   else
+      mysql -u root -p $MYSQLROOT <<EOF
+      CREATE DATABASE  $WPDATABASE;
+      GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD';
+      FLUSH PRIVILEGES;
+      EXIT;
+EOF
+else
       echo -----------------------------------------------------------------------------
       echo "MARIADB is already INSTALLED"
       echo -----------------------------------------------------------------------------
       read -p "Enter the Mysql root password:  " EXISTINGPASSWORD
-      mysql -u root -p $EXISTINGPASSWORD "CREATE DATABASE  $WPDATABASE;"
-      mysql -u root -p $EXISTINGPASSWORD "GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD';"
-      mysql -u root -p $EXISTINGPASSWORD "FLUSH PRIVILEGES;" 
+      mysql -u root -p $EXISTINGPASSWORD <<EOF 
+      CREATE DATABASE  $WPDATABASE;
+      GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD';
+      FLUSH PRIVILEGES;
+      EXIT;
+EOF
 fi
 
 
