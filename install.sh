@@ -31,6 +31,9 @@ WPUSER=$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 10 | head -n 1)
 echo Wordpress user = $WPUSER >> /root/WORDPRESSpassword.txt
 WPPASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
 echo Wordpress password = $WPPASSWORD >> /root/WORDPRESSpassword.txt
+echo CREATE DATABASE $WPDATABASE; >> /tmp/$WORDPRESSSITE.sql
+echo GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD'; >> /tmp/$WORDPRESSSITE.sql
+echo FLUSH PRIVILEGES; >> /tmp/$WORDPRESSSITE.sql
 
 ## Installing Mariadb and Database setup for Wordpress
 if [ ! -x /usr/bin/mysql ];
@@ -50,19 +53,15 @@ if [ ! -x /usr/bin/mysql ];
       y
 EOF
       echo Mysql root password = $MYSQLROOT >> /root/WORDPRESSpassword.txt
-      mysql -u root -p -e $EXISTINGPASSWORD "CREATE DATABASE $WPDATABASE"
-      mysql -u root -p -e $EXISTINGPASSWORD "GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD'"
-      mysql -u root -p -e $EXISTINGPASSWORD "FLUSH PRIVILEGES"
+      mysql -u root -p"$MYSQLROOT" < /tmp/$WORDPRESSSITE.sql
 else
       echo -----------------------------------------------------------------------------
       echo "MARIADB is already INSTALLED"
       echo -----------------------------------------------------------------------------
       read -p "Enter the Mysql root password:  " EXISTINGPASSWORD
-      mysql -u root -p -e $EXISTINGPASSWORD "CREATE DATABASE $WPDATABASE"
-      mysql -u root -p -e $EXISTINGPASSWORD "GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD'"
-      mysql -u root -p -e $EXISTINGPASSWORD "FLUSH PRIVILEGES"
+      mysql -u root -p"$EXISTINGPASSWORD" < /tmp/$WORDPRESSSITE.sql
 fi
-
+rm -rf /tmp/$WORDPRESSSITE.sql
 
 ## Installing PHP
 
