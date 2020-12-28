@@ -106,6 +106,11 @@ wget https://wordpress.org/latest.tar.gz
 tar xf latest.tar.gz
 mv /tmp/wordpress/* /var/www/html/$WORDPRESSSITE
 chown -R nginx: /var/www/html/$WORDPRESSSITE
+cp /var/www/html/$WORDPRESSSITE
+cp wp-config-sample.php wp-config.php	
+sed -i 's|database_name_here|$WPDATABASE|g' /var/www/html/$WORDPRESSSITE/wp-config.php
+sed -i 's|username_here|$WPUSER|g' /var/www/html/$WORDPRESSSITE/wp-config.php
+sed -i 's|password_here|$WPPASSWORD|g' /var/www/html/$WORDPRESSSITE/wp-config.php
 
 #Configuring TEST block NGINX
 
@@ -113,10 +118,13 @@ IP=$(curl checkip.amazonaws.com)
 touch /etc/nginx/conf.d/$WORDPRESSSITE.conf
 cat > /etc/nginx/conf.d/$WORDPRESSSITE.conf << EOL
 server {
-    listen       80;
-    server_name  $IP $HOSTNAME;
-    root   /usr/share/nginx/html;
+    listen 80;
+    server_name  $IP $WORDPRESSSITE www.$WORDPRESSSITE;
+    root   /usr/share/nginx/html/$WORDPRESSSITE;
     index index.php index.html index.htm;
+    
+    access_log /var/log/nginx/$WORDPRESSSITE.access.log;
+    error_log /var/log/nginx/$WORDPRESSSITE.error.log;
     
     location ~ \.php$ {
     fastcgi_pass unix:/run/php-fpm/www.sock;
@@ -127,7 +135,6 @@ server {
 }
 EOL
 sed -i 's|fastcgi_param SCRIPT_FILENAME ;|fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;|g' /etc/nginx/conf.d/$WORDPRESSSITE.conf
-sed -i 's|root   /usr/share/nginx/html;|root   /usr/share/nginx/html/$WORDPRESSSITE;|g' /etc/nginx/conf.d/$WORDPRESSSITE.conf
 
 systemctl restart nginx
 
