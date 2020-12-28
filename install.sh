@@ -134,5 +134,5 @@ certbot --nginx -d $WORDPRESSSITE
 systemctl restart nginx
 
 echo ...............................Finished...Installation....!!!
-echo " Visit.... http://$WORDPRESSSITE"
+echo " Visit.... https://$WORDPRESSSITE"
 echo " All password and username are stored in /root/WORDPRESSpassword.txt"
