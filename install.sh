@@ -58,7 +58,7 @@ EOF
       echo -----------------------------------------------------------------------------
       read -p "Enter the Mysql root password:  " EXISTINGPASSWORD
       mysql -u root -p $EXISTINGPASSWORD "CREATE DATABASE  $WPDATABASE;"
-      mysql -u root -p $EXISTINGPASSWORD "NT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD';"
+      mysql -u root -p $EXISTINGPASSWORD "GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD';"
       mysql -u root -p $EXISTINGPASSWORD "FLUSH PRIVILEGES;" 
 fi
 
