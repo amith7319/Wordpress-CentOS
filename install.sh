@@ -49,7 +49,7 @@ if [ ! -x /usr/bin/mysql ];
       y
       y
 EOF
-      echo Mysql root password = $MYSQLROOT > /root/WORDPRESSpassword.txt
+      echo Mysql root password = $MYSQLROOT >> /root/WORDPRESSpassword.txt
       mysql -u root -p $MYSQLROOT "CREATE DATABASE  $WPDATABASE;"
       mysql -u root -p $MYSQLROOT "GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD';"
       mysql -u root -p $MYSQLROOT "FLUSH PRIVILEGES;"
