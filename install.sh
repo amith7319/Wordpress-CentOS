@@ -24,7 +24,7 @@ fi
 
 # Database environment creation
 MYSQLROOT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
-echo Mysql root password = $MYSQLROOT >> /root/WORDPRESSpassword.txt
+echo Mysql root password = $MYSQLROOT > /root/WORDPRESSpassword.txt
 WPDATABASE=$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 10 | head -n 1)
 echo Wordpress database name = $WPDATABASE >> /root/WORDPRESSpassword.txt
 WPUSER=$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 10 | head -n 1)
@@ -50,7 +50,7 @@ if [ ! -x /usr/bin/mysql ];
       y
       EOF
       mysql -u root -p $MYSQLROOT "CREATE DATABASE  $WPDATABASE;"
-      mysql -u root -p $MYSQLROOTGR "NT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD';"
+      mysql -u root -p $MYSQLROOT "GRANT ALL ON wordpress.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASSWORD';"
       mysql -u root -p $MYSQLROOT "FLUSH PRIVILEGES;"
    else
       echo -----------------------------------------------------------------------------
