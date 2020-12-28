@@ -6,7 +6,7 @@ fi
 read -p "Enter the system Wordpress site name:  " WORDPRESSSITE
 
 yum update -y
-yum install wget epel-release curl nano certbot-nginx -y
+yum install wget epel-release curl nano -y
 
 # Installing Nginx
 
@@ -23,6 +23,7 @@ if [ ! -x /usr/sbin/nginx ];
 fi
 
 # Database environment creation
+
 MYSQLROOT=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
 echo Wordpress site name = $WORDPRESSSITE >> /root/WORDPRESSpassword.txt
 WPDATABASE=$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 10 | head -n 1)
@@ -36,6 +37,7 @@ echo "GRANT ALL ON $WPDATABASE.* TO '$WPUSER'@'localhost' IDENTIFIED BY '$WPPASS
 echo "FLUSH PRIVILEGES;" >> /tmp/$WORDPRESSSITE.sql
 
 ## Installing Mariadb and Database setup for Wordpress
+
 if [ ! -x /usr/bin/mysql ];
    then
       echo "MARIADB will be INSTALLED now"
@@ -94,6 +96,7 @@ systemctl enable php-fpm
 systemctl start php-fpm
 
 # Downloading Wordpress
+
 sudo mkdir -p /var/www/html/$WORDPRESSSITE
 cd /tmp
 wget https://wordpress.org/latest.tar.gz
@@ -129,10 +132,7 @@ server {
 }
 EOL
 sed -i 's|fastcgi_param SCRIPT_FILENAME ;|fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;|g' /etc/nginx/conf.d/$WORDPRESSSITE.conf
-
-certbot --nginx -d $WORDPRESSSITE
 systemctl restart nginx
-
 echo ...............................Finished...Installation....!!!
 echo " Visit.... https://$WORDPRESSSITE"
 echo " All password and username are stored in /root/WORDPRESSpassword.txt"
