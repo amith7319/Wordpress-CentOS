@@ -29,7 +29,7 @@ WPDATABASE=$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 10 | head -n 1)
 echo Wordpress database name = $WPDATABASE >> /root/WORDPRESSpassword.txt
 WPUSER=$(cat /dev/urandom | tr -dc 'a-zA-Z' | fold -w 10 | head -n 1)
 echo Wordpress user = $WPUSER >> /root/WORDPRESSpassword.txt
-WPPASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 20 | head -n 1)
+WPPASSWORD=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
 echo Wordpress password = $WPPASSWORD >> /root/WORDPRESSpassword.txt
 
 ## Installing Mariadb and Database setup for Wordpress
@@ -101,7 +101,7 @@ wget https://wordpress.org/latest.tar.gz
 tar xf latest.tar.gz
 mv /tmp/wordpress/* /var/www/html/$WORDPRESSSITE
 chown -R nginx: /var/www/html/$WORDPRESSSITE
-cp /var/www/html/$WORDPRESSSITE
+cd /var/www/html/$WORDPRESSSITE
 cp wp-config-sample.php wp-config.php	
 sed -i 's|database_name_here|$WPDATABASE|g' /var/www/html/$WORDPRESSSITE/wp-config.php
 sed -i 's|username_here|$WPUSER|g' /var/www/html/$WORDPRESSSITE/wp-config.php
