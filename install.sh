@@ -136,4 +136,4 @@ systemctl restart nginx
 echo ...............................Finished...Installation....!!!
 echo " Visit.... https://$WORDPRESSSITE"
 echo " All password and username are stored in /root/WORDPRESSpassword.txt"
-echo "----------amith7319@gmail.com--------------------"
+echo "----------Connect to me amith7319@gmail.com--------------------"
